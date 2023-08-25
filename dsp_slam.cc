@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 {
     if(argc != 5)
     {
-        cerr << endl << "Usage: ./dsp_slam path_to_vocabulary path_to_settings path_to_sequence path_to_save_map" << endl;
+        cerr << endl << "Usage: ./dsp_slam path_to_vocabulary path_to_settings path_to_sequence path_to_save_map path_to_parking_areas" << endl;
         return 1;
     }
 

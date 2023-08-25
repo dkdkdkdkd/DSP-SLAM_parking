@@ -85,6 +85,8 @@ public:
     // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and Viewer threads.
     System(const string &strVocFile, const string &strSettingsFile, const string &strSequencePath, const eSensor sensor = System::STEREO);
 
+    //void CheckWellParked(const &pathParkingAreas, )
+
     // Proccess the given stereo frame. Images must be synchronized and rectified.
     // Input images: RGB (CV_8UC3) or grayscale (CV_8U). RGB is converted to grayscale.
     // Returns the camera pose (empty if tracking fails).
