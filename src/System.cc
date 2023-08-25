@@ -37,7 +37,7 @@ bool has_suffix(const std::string &str, const std::string &suffix) {
 namespace ORB_SLAM2
 {
 
-System::System(const string &strVocFile, const string &strSettingsFile, const string &strSequencePath,
+System::System(const string &strVocFile, const string &strSettingsFile, const string &strSequencePath, const string &strParkingAreas,
                const eSensor sensor) :
                mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)),
                mbReset(false),mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false)
