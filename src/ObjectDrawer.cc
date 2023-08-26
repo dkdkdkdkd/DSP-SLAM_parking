@@ -66,6 +66,31 @@ void ObjectDrawer::DrawObjects(bool bFollow, const Eigen::Matrix4f &Tec)
     unique_lock<mutex> lock(mMutexObjects);
 
     auto mvpMapObjects = mpMap->GetAllMapObjects();
+    //   add check parking area     
+    ifstream file("/home/jiho/slam/DSP-SLAM_parking/parking_areas.txt");
+
+    string line;
+    string tmp;
+    bool check = false;
+    int count = 0;
+    float distance;
+    vector <vector<float>> areas;
+    int color = 0;
+
+    if(file.is_open()){
+        while(getline(file, line)) {
+            if (count%2==1){
+                vector<float> area;
+                stringstream ss(line);
+                while(getline(ss, tmp, ' ')){
+                    // cout << tmp << endl;
+                    area.push_back(std::stof(tmp));
+                }
+                    areas.push_back(area);
+                }
+            count++;
+        }
+    }
 
     for (MapObject *pMO : mvpMapObjects)
     {
@@ -75,6 +100,24 @@ void ObjectDrawer::DrawObjects(bool bFollow, const Eigen::Matrix4f &Tec)
             continue;
 
         Eigen::Matrix4f Sim3Two = pMO->GetPoseSim3();
+
+        for(auto iter:areas){
+            distance = 0.0;
+
+                for(int i=0;i<3;i++){
+                    distance += (Sim3Two(i, 3) - iter[i*4+3])*(Sim3Two(i, 3) - iter[i*4+3]);
+                }
+            distance = sqrt(distance);
+            if (distance<1.5){
+                color = 2;
+                cout<<"id: " << pMO->mnId << " " << "True" << endl;
+                break;
+            }
+            else
+                color = 0;
+        }
+
+
         int idx = pMO->GetRenderId();
 
         if (bFollow) {
@@ -82,7 +125,8 @@ void ObjectDrawer::DrawObjects(bool bFollow, const Eigen::Matrix4f &Tec)
         }
         if (pMO->GetRenderId() >= 0)
         {
-            mpRenderer->Render(idx, Tec * SE3TcwFollow * Sim3Two, mvObjectColors[pMO->GetRenderId() % mvObjectColors.size()]);
+            // mpRenderer->Render(idx, Tec * SE3TcwFollow * Sim3Two, mvObjectColors[pMO->GetRenderId() % mvObjectColors.size()]);
+            mpRenderer->Render(idx, Tec * SE3TcwFollow * Sim3Two, mvObjectColors[color]);
         }
         // DrawCuboid(pMO);
     }
