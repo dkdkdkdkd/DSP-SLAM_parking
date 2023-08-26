@@ -43,7 +43,7 @@ class KeyFrameDatabase
 {
 public:
 
-    KeyFrameDatabase(ORBVocabulary &voc);
+    KeyFrameDatabase(ORBVocabulary *voc);
 
    void add(KeyFrame* pKF);
 

@@ -112,7 +112,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const st
     }
     else 
     {
-        mpKeyFrameDatabase = new KeyFrameDatabase(*mpVocabulary);
+        mpKeyFrameDatabase = new KeyFrameDatabase(mpVocabulary);
         mpMap = new Map();
     }
    

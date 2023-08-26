@@ -71,7 +71,6 @@ void ObjectDrawer::DrawObjects(bool bFollow, const Eigen::Matrix4f &Tec)
 
     string line;
     string tmp;
-    bool check = false;
     int count = 0;
     float distance;
     vector <vector<float>> areas;
