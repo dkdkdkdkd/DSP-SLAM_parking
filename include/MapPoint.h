@@ -27,6 +27,7 @@
 
 #include<opencv2/core/core.hpp>
 #include<mutex>
+#include "BoostArchiver.h"
 
 namespace ORB_SLAM2
 {
@@ -88,6 +89,15 @@ public:
     bool mbOutlier;  // Outlier for object
     void SetOutlierFlag();
     bool isOutlier();
+
+public:
+    // for serialization
+    MapPoint();
+private:
+    // serialize is recommended to be private
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive &ar, const unsigned int version);
 
 public:
     long unsigned int mnId;

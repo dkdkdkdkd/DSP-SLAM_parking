@@ -27,49 +27,49 @@ void Map::AddMapObject(MapObject *pMO)
     mspMapObjects.insert(pMO);
     // vector<vector<float>> area;
 
-    auto pose = pMO->GetPoseSim3();
+    // auto pose = pMO->GetPoseSim3();
 
-    // cout << "hello" << typeid(pose(0, 3)).name() << endl;
+    // // cout << "hello" << typeid(pose(0, 3)).name() << endl;
 
-    ifstream file("/home/jiho/slam/DSP-SLAM_parking/parking_areas.txt");
+    // ifstream file("/home/jiho/slam/DSP-SLAM_parking/parking_areas.txt");
 
-    string line;
-    string tmp;
-    bool check = false;
-    int count = 0;
-    float distance;
+    // string line;
+    // string tmp;
+    // bool check = false;
+    // int count = 0;
+    // float distance;
 
-    if(file.is_open()){
-        while(getline(file, line)) {
-            vector<float> area;
+    // if(file.is_open()){
+    //     while(getline(file, line)) {
+    //         vector<float> area;
     
-            if (count%2==1){
+    //         if (count%2==1){
 
-                stringstream ss(line);
-                while(getline(ss, tmp, ' ')){
-                    // cout << tmp << endl;
-                    area.push_back(std::stof(tmp));
-                }
-                distance = 0.0;
+    //             stringstream ss(line);
+    //             while(getline(ss, tmp, ' ')){
+    //                 // cout << tmp << endl;
+    //                 area.push_back(std::stof(tmp));
+    //             }
+    //             distance = 0.0;
 
-                for(int i=0;i<3;i++){
-                    distance += (pose(i, 3) - area[i*4+3])*(pose(i, 3) - area[i*4+3]);
-                }
-                distance = sqrt(distance);
-                if (distance<1.5){
-                    check = true;
+    //             for(int i=0;i<3;i++){
+    //                 distance += (pose(i, 3) - area[i*4+3])*(pose(i, 3) - area[i*4+3]);
+    //             }
+    //             distance = sqrt(distance);
+    //             if (distance<1.5){
+    //                 check = true;
                     
-                    cout<<"id: " << pMO->mnId << " " << "True" << endl;
-                }
-            }
-            count++;
-        }
-        if (!check)
-            cout<<"id: " << pMO->mnId << " " << "False" << endl;
+    //                 cout<<"id: " << pMO->mnId << " " << "True" << endl;
+    //             }
+    //         }
+    //         count++;
+    //     }
+    //     if (!check)
+    //         cout<<"id: " << pMO->mnId << " " << "False" << endl;
         
-    }
-    else
-        cout<< "not file" << endl;
+    // }
+    // else
+    //     cout<< "not file" << endl;
 
 }
 

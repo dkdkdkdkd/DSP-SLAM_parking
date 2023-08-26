@@ -67,3 +67,4 @@ Viewer.ViewpointY: -250
 Viewer.ViewpointZ: -0.1
 Viewer.ViewpointF: 2000
 
+Map.mapfile: map_video.bin

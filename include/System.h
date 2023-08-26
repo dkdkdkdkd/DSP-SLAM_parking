@@ -37,7 +37,7 @@
 #include "KeyFrameDatabase.h"
 #include "ORBVocabulary.h"
 #include "Viewer.h"
-
+#include "BoostArchiver.h"
 #include <pybind11/embed.h>
 #include <pybind11/eigen.h>
 
@@ -83,7 +83,7 @@ public:
 public:
 
     // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and Viewer threads.
-    System(const string &strVocFile, const string &strSettingsFile, const string &strSequencePath, const eSensor sensor = System::STEREO);
+    System(const string &strVocFile, const string &strSettingsFile, const string &strSequencePath, const eSensor sensor = System::STEREO, bool is_save_map_=false);
 
     //void CheckWellParked(const &pathParkingAreas, )
 
@@ -160,6 +160,11 @@ public:
     py::object pySequence;
 
 private:
+    // Save/Load functions
+    void SaveMap(const string &filename);
+    bool LoadMap(const string &filename);
+
+private:
 
     // Input sensor
     eSensor mSensor;
@@ -172,6 +177,9 @@ private:
 
     // Map structure that stores the pointers to all KeyFrames and MapPoints.
     Map* mpMap;
+
+    string mapfile;
+    bool is_save_map;
 
     // Tracker. It receives a frame and computes the associated camera pose.
     // It also decides when to insert a new keyframe, create some new MapPoints and

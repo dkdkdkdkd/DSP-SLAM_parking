@@ -29,9 +29,9 @@ void LoadImages(const string &strPathToSequence, const float &fps, vector<string
 
 int main(int argc, char **argv)
 {
-    if(argc != 5)
+    if(argc != 6)
     {
-        cerr << endl << "Usage: ./dsp_slam path_to_vocabulary path_to_settings path_to_sequence path_to_save_map path_to_parking_areas" << endl;
+        cerr << endl << "Usage: ./dsp_slam path_to_vocabulary path_to_settings path_to_sequence path_to_save_map path_to_parking_areas [1|0](save map?)" << endl;
         return 1;
     }
 
@@ -47,7 +47,7 @@ int main(int argc, char **argv)
     const int nImages = vstrImageLeft.size();
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(argv[1],argv[2], argv[3], ORB_SLAM2::System::STEREO);
+    ORB_SLAM2::System SLAM(argv[1],argv[2], argv[3], ORB_SLAM2::System::STEREO, (bool)atoi(argv[5]));
 
     // Vector for tracking time statistics
     vector<float> vTimesTrack;

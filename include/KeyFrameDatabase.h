@@ -28,7 +28,7 @@
 #include "KeyFrame.h"
 #include "Frame.h"
 #include "ORBVocabulary.h"
-
+#include "BoostArchiver.h"
 #include<mutex>
 
 
@@ -57,6 +57,16 @@ public:
    // Relocalization
    std::vector<KeyFrame*> DetectRelocalizationCandidates(Frame* F);
 
+public:
+    // for serialization
+    KeyFrameDatabase() {}
+    void SetORBvocabulary(ORBVocabulary *porbv) {mpVoc=porbv;}
+private:
+   // serialize is recommended to be private
+   friend class boost::serialization::access;
+   template<class Archive>
+   void serialize(Archive &ar, const unsigned int version);
+   
 protected:
 
   // Associated vocabulary

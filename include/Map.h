@@ -25,7 +25,7 @@
 #include "KeyFrame.h"
 #include <set>
 #include <mutex>
-
+#include "BoostArchiver.h"
 
 
 namespace ORB_SLAM2
@@ -74,6 +74,12 @@ public:
     void EraseMapObject(MapObject* pMO);
     MapObject* GetMapObject(int object_id);
     std::vector<MapObject*> GetAllMapObjects();
+
+private:
+    // serialize is recommended to be private
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive &ar, const unsigned int version);
 
 protected:
     std::set<MapPoint*> mspMapPoints;

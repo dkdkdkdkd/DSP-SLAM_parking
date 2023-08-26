@@ -32,6 +32,7 @@
 #include "MapObject.h"
 
 #include <mutex>
+#include "BoostArchiver.h"
 
 #include <pybind11/embed.h>
 #include <pybind11/eigen.h>
@@ -123,8 +124,15 @@ public:
     static bool lId(KeyFrame* pKF1, KeyFrame* pKF2){
         return pKF1->mnId<pKF2->mnId;
     }
-
-
+public:
+    // for serialization
+    KeyFrame(); // Default constructor for serialization, need to deal with const member
+    void SetORBvocabulary(ORBVocabulary *porbv) {mpORBvocabulary=porbv;}
+private:
+    // serialize is recommended to be private
+    friend class boost::serialization::access;
+    template<class Archive>
+    void serialize(Archive &ar, const unsigned int version);
     // The following variables are accesed from only 1 thread or never change (no mutex needed).
 public:
 
