@@ -31,8 +31,9 @@ namespace ORB_SLAM2 {
 void Tracking::GetObjectDetectionsLiDAR(KeyFrame *pKF) {
 
     PyThreadStateLock PyThreadLock;
-
+    
     py::list detections = mpSystem->pySequence.attr("get_frame_by_id")(pKF->mnFrameId);
+
     for (auto det : detections) {
         auto pts = det.attr("surface_points").cast<Eigen::MatrixXf>();
         auto Sim3Tco = det.attr("T_cam_obj").cast<Eigen::Matrix4f>();
@@ -162,7 +163,7 @@ cv::Mat Tracking::GetCameraIntrinsics()
 void Tracking::GetObjectDetectionsMono(KeyFrame *pKF)
 {
     PyThreadStateLock PyThreadLock;
-
+    // cout<< pKF->mnFrameId << "Mono" << endl;
     py::list detections = mpSystem->pySequence.attr("get_frame_by_id")(pKF->mnFrameId);
     int num_dets = detections.size();
     // No detections, return immediately

@@ -48,6 +48,7 @@ class FrameWithLiDAR:
         self.velo_file = os.path.join(self.velo_dir, "{:06d}".format(frame_id) + ".bin")
         self.img_bgr = cv2.imread(rgb_file)
         self.img_rgb = cv2.cvtColor(self.img_bgr, cv2.COLOR_BGR2RGB)
+
         self.img_h, self.img_w, _ = self.img_rgb.shape
         self.velo_pts = load_velo_scan(self.velo_file)
         self.instances = []

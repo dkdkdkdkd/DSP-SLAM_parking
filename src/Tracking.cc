@@ -522,7 +522,7 @@ void Tracking::Track()
 }
 
 void Tracking::StereoInitialization()
-{
+{  
     if(mCurrentFrame.N>500)
     {
         // Set Frame pose to the origin
@@ -1076,7 +1076,8 @@ bool Tracking::NeedNewKeyFrame()
 }
 
 void Tracking::CreateNewKeyFrame()
-{
+{   
+    
     if(!mpLocalMapper->SetNotStop(true))
         return;
 
@@ -1380,7 +1381,19 @@ bool Tracking::Relocalization()
 {
     // Compute Bag of Words Vector
     mCurrentFrame.ComputeBoW();
-
+    // if(NeedNewKeyFrame())
+    //     {
+    //         KeyFrame* pKF = new KeyFrame(mCurrentFrame,mpMap,mpKeyFrameDB);
+    //     }
+    
+    // if (mSensor == System::STEREO)
+    // {
+    //     GetObjectDetectionsLiDAR(pKF);
+    //     if (!mpMap->GetAllMapObjects().empty())
+    //     {
+    //         ObjectDataAssociation(pKF);
+    //     }
+    // }
     // Relocalization is performed when tracking is lost
     // Track Lost: Query KeyFrame Database for keyframe candidates for relocalisation
     vector<KeyFrame*> vpCandidateKFs = mpKeyFrameDB->DetectRelocalizationCandidates(&mCurrentFrame);

@@ -123,7 +123,7 @@ public:
     static bool lId(MapObject* pMO1, MapObject* pMO2){
         return pMO1->mnId < pMO2->mnId;
     }
-
+    int checkArea = 0;
 };
 
 }

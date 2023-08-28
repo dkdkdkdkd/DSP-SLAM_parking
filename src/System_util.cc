@@ -136,7 +136,7 @@ void System::SaveEntireMap(const string &dir) {
         if (pMO->isDynamic())
             continue;
 
-        f_obj << pMO->mnId << endl;
+        f_obj << pMO->mnId << " " << pMO->checkArea<< endl;
         auto Two = pMO->GetPoseSim3();
         f_obj << setprecision(9) << Two(0, 0) << " " << Two(0, 1) << " " << Two(0, 2) << " " << Two(0, 3) << " " <<
               Two(1, 0) << " " << Two(1, 1) << " " << Two(1, 2) << " " << Two(1, 3) << " " <<

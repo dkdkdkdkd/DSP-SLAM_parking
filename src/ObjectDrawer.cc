@@ -25,8 +25,8 @@ ObjectDrawer::ObjectDrawer(Map *pMap, MapDrawer *pMapDrawer, const string &strSe
     cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
     mViewpointF = fSettings["Viewer.ViewpointF"];
     mvObjectColors.push_back(std::tuple<float, float, float>({230. / 255., 0., 0.}));	 // red  0
-    mvObjectColors.push_back(std::tuple<float, float, float>({60. / 255., 180. / 255., 75. / 255.}));   // green  1
-    mvObjectColors.push_back(std::tuple<float, float, float>({0., 0., 255. / 255.}));	 // blue  2
+    mvObjectColors.push_back(std::tuple<float, float, float>({0., 0., 255. / 255.}));	 // blue  1
+    mvObjectColors.push_back(std::tuple<float, float, float>({60. / 255., 180. / 255., 75. / 255.}));   // green  2
     mvObjectColors.push_back(std::tuple<float, float, float>({255. / 255., 0, 255. / 255.}));   // Magenta  3
     mvObjectColors.push_back(std::tuple<float, float, float>({255. / 255., 165. / 255., 0}));   // orange 4
     mvObjectColors.push_back(std::tuple<float, float, float>({128. / 255., 0, 128. / 255.}));   //purple 5
@@ -74,19 +74,19 @@ void ObjectDrawer::DrawObjects(bool bFollow, const Eigen::Matrix4f &Tec)
     int count = 0;
     float distance;
     vector <vector<float>> areas;
-    int color = 0;
+    
 
     if(file.is_open()){
         while(getline(file, line)) {
-            if (count%2==1){
-                vector<float> area;
-                stringstream ss(line);
-                while(getline(ss, tmp, ' ')){
-                    // cout << tmp << endl;
-                    area.push_back(std::stof(tmp));
-                }
-                    areas.push_back(area);
-                }
+            // if (count%2==1){
+            vector<float> area;
+            stringstream ss(line);
+            while(getline(ss, tmp, ' ')){
+                // cout << tmp << endl;
+                area.push_back(std::stof(tmp));
+            }
+                areas.push_back(area);
+                // }
             count++;
         }
     }
@@ -103,18 +103,19 @@ void ObjectDrawer::DrawObjects(bool bFollow, const Eigen::Matrix4f &Tec)
         for(auto iter:areas){
             distance = 0.0;
 
-                for(int i=0;i<3;i++){
-                    distance += (Sim3Two(i, 3) - iter[i*4+3])*(Sim3Two(i, 3) - iter[i*4+3]);
-                }
+                distance += (Sim3Two(0, 3) - iter[0*4+3])*(Sim3Two(0, 3) - iter[0*4+3]);
+                distance += (Sim3Two(2, 3) - iter[2*4+3])*(Sim3Two(2, 3) - iter[2*4+3]);
+            
             distance = sqrt(distance);
-            if (distance<1.5){
-                color = 2;
+            if (distance<7){
+                pMO->checkArea = 1;
                 cout<<"id: " << pMO->mnId << " " << "True" << endl;
                 break;
             }
             else
-                color = 0;
+                pMO->checkArea = 0;
         }
+        cout <<pMO->checkArea<<endl;
 
 
         int idx = pMO->GetRenderId();
@@ -125,7 +126,7 @@ void ObjectDrawer::DrawObjects(bool bFollow, const Eigen::Matrix4f &Tec)
         if (pMO->GetRenderId() >= 0)
         {
             // mpRenderer->Render(idx, Tec * SE3TcwFollow * Sim3Two, mvObjectColors[pMO->GetRenderId() % mvObjectColors.size()]);
-            mpRenderer->Render(idx, Tec * SE3TcwFollow * Sim3Two, mvObjectColors[color]);
+            mpRenderer->Render(idx, Tec * SE3TcwFollow * Sim3Two, mvObjectColors[pMO->checkArea]);
         }
         // DrawCuboid(pMO);
     }
