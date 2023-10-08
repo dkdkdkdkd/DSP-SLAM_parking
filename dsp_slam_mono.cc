@@ -33,9 +33,9 @@ void LoadImages(const string &strSequence, const float &fps, vector<string> &vst
 
 int main(int argc, char **argv)
 {
-    if(argc != 5)
+    if(argc != 6)
     {
-        cerr << endl << "Usage: ./mono_kitti path_to_vocabulary path_to_settings path_to_sequence path_to_saved_trajectory" << endl;
+        cerr << endl << "Usage: ./mono_kitti path_to_vocabulary path_to_settings path_to_sequence path_to_saved_trajectory [1|0](save map?)" << endl;
         return 1;
     }
 
@@ -50,7 +50,7 @@ int main(int argc, char **argv)
     int nImages = vstrImageFilenames.size();
 
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
-    ORB_SLAM2::System SLAM(argv[1], argv[2], argv[3], ORB_SLAM2::System::MONOCULAR, 1);
+    ORB_SLAM2::System SLAM(argv[1], argv[2], argv[3], ORB_SLAM2::System::MONOCULAR, (bool)atoi(argv[5]));
 
     // Vector for tracking time statistics
     vector<float> vTimesTrack;

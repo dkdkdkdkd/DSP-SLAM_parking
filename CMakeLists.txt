@@ -1,3 +1,4 @@
+SET(CMAKE_PREFIX_PATH "/usr/lib/x86_64-linux-gnu/cmake")
 cmake_policy(SET CMP0048 NEW)
 project("DSP-SLAM")
 cmake_minimum_required(VERSION 3.2)
@@ -90,3 +91,7 @@ target_link_libraries(dsp_slam ${PROJECT_NAME})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
 add_executable(dsp_slam_mono dsp_slam_mono.cc)
 target_link_libraries(dsp_slam_mono ${PROJECT_NAME})
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR})
+add_executable(camera_slam_mono camera_slam_mono.cc)
+target_link_libraries(camera_slam_mono ${PROJECT_NAME})

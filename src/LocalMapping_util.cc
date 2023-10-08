@@ -246,7 +246,7 @@ void LocalMapping::CreateNewObjectsFromDetections()
             pNewObj->AddMapPoints(pMP);
             n_valid_points++;
         }
-        return;  // for mono sequences, we only focus on the single object in the middle
+        // return;  // for mono sequences, we only focus on the single object in the middle
     }
 }
 
@@ -275,8 +275,8 @@ void LocalMapping::ProcessDetectedObjects()
         if (!pMO)
             continue;
         // We only consider the object in the middle
-        if (pMO->mnId != 0)
-            continue;
+        // if (pMO->mnId != 0)
+        //     continue;
 
         int numKFsPassedSinceInit = int(mpCurrentKeyFrame->mnId - pMO->mpRefKF->mnId);
 
@@ -327,7 +327,8 @@ void LocalMapping::ProcessDetectedObjects()
         // cout << "Object " << pMO->mnId << ": " << n_points << " points observed, " << "with " << n_valid_points << " valid points, and " << n_rays << " rays" << endl;
 
         // Surface points
-        if (n_valid_points >= 50 && n_rays > 20)
+        //n_valid_points >= 50 && n_rays > 20
+        if (n_valid_points >= 10 && n_rays > 10)
         {
             Eigen::MatrixXf surface_points_cam = Eigen::MatrixXf::Zero(n_valid_points, 3);
             int p_i = 0;

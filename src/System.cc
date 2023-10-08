@@ -98,17 +98,20 @@ System::System(const string &strVocFile, const string &strSettingsFile, const st
     py::module sys = py::module::import("sys");
     sys.attr("path").attr("append")("./");
     py::module io_utils = py::module::import("reconstruct.utils");
+    
     string pyCfgPath = fSettings["DetectorConfigPath"].string();
     pyCfg = io_utils.attr("get_configs")(pyCfgPath);
     pyDecoder = io_utils.attr("get_decoder")(pyCfg);
     pySequence = py::module::import("reconstruct").attr("get_sequence")(strSequencePath, pyCfg);
+    cout << endl << "-------" << endl;
     InitThread();
 
     //Create KeyFrame Database
     //Create the Map
     if (!mapfile.empty() && LoadMap(mapfile))
     {
-        bReuseMap = true;
+        bReuseMap = false;
+
     }
     else 
     {
@@ -141,7 +144,8 @@ System::System(const string &strVocFile, const string &strSettingsFile, const st
     }
     else
     {
-        mpLoopCloser = nullptr;
+        mpLoopCloser = new LoopClosing(mpMap, mpKeyFrameDatabase, mpVocabulary, mSensor==MONOCULAR);
+        mptLoopClosing = new thread(&ORB_SLAM2::LoopClosing::Run, mpLoopCloser);
     }
 
     //Initialize the Viewer thread and launch

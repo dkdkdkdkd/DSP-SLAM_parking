@@ -45,7 +45,6 @@ int main(int argc, char **argv)
     LoadImages(string(argv[3]), fps, vstrImageLeft, vstrImageRight, vTimestamps);
 
     const int nImages = vstrImageLeft.size();
-
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM2::System SLAM(argv[1],argv[2], argv[3], ORB_SLAM2::System::STEREO, (bool)atoi(argv[5]));
 
@@ -97,10 +96,10 @@ int main(int argc, char **argv)
         // SLAM.SaveMapCurrentFrame(string(argv[4]), ni);
 
     }
-
+    
     SLAM.SaveEntireMap(string(argv[4]));
 
-    cv::waitKey(0);
+    
     // Stop all threads
     SLAM.Shutdown();
     // Tracking time statistics

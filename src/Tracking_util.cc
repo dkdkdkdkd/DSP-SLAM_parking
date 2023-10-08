@@ -37,6 +37,7 @@ void Tracking::GetObjectDetectionsLiDAR(KeyFrame *pKF) {
     for (auto det : detections) {
         auto pts = det.attr("surface_points").cast<Eigen::MatrixXf>();
         auto Sim3Tco = det.attr("T_cam_obj").cast<Eigen::Matrix4f>();
+
         auto rays = det.attr("rays");
         Eigen::MatrixXf rays_mat;
         Eigen::VectorXf depth;
@@ -163,7 +164,7 @@ cv::Mat Tracking::GetCameraIntrinsics()
 void Tracking::GetObjectDetectionsMono(KeyFrame *pKF)
 {
     PyThreadStateLock PyThreadLock;
-    // cout<< pKF->mnFrameId << "Mono" << endl;
+    cout<< pKF->mnFrameId << "Mono" << endl;
     py::list detections = mpSystem->pySequence.attr("get_frame_by_id")(pKF->mnFrameId);
     int num_dets = detections.size();
     // No detections, return immediately
@@ -172,12 +173,14 @@ void Tracking::GetObjectDetectionsMono(KeyFrame *pKF)
 
     for (int detected_idx = 0; detected_idx < num_dets; detected_idx++)
     {
+
         auto det = new ObjectDetection();
         auto py_det = detections[detected_idx];
         det->background_rays = py_det.attr("background_rays").cast<Eigen::MatrixXf>();
         auto mask = py_det.attr("mask").cast<Eigen::MatrixXf>();
         cv::Mat mask_cv;
         cv::eigen2cv(mask, mask_cv);
+
         // cv::imwrite("mask.png", mask_cv);
         cv::Mat mask_erro = mask_cv.clone();
         cv::Mat kernel = getStructuringElement(cv::MORPH_ELLIPSE,
@@ -188,10 +191,15 @@ void Tracking::GetObjectDetectionsMono(KeyFrame *pKF)
         // get 2D feature points inside mask
         for (int i = 0; i < pKF->mvKeys.size(); i++)
         {
+//             std::cout << "mask_erro size: " << mask_erro.rows << "x" << mask_erro.cols << std::endl;
+// std::cout << "Accessing: " << pKF->mvKeys[i].pt.y << ", " << pKF->mvKeys[i].pt.x << std::endl;
+
             int val = (int) mask_erro.at<float>(pKF->mvKeys[i].pt.y, pKF->mvKeys[i].pt.x);
             if (val > 0)  // inside the mask
             {
+
                 det->AddFeaturePoint(i);
+                
             }
         }
 
@@ -201,7 +209,9 @@ void Tracking::GetObjectDetectionsMono(KeyFrame *pKF)
             det->isGood = false;
         }
         pKF->mvpDetectedObjects.push_back(det);
+
     }
+
     pKF->nObj = pKF->mvpDetectedObjects.size();
     pKF->mvpMapObjects = vector<MapObject *>(pKF->nObj, static_cast<MapObject *>(NULL));
 
@@ -274,8 +284,8 @@ void Tracking::AssociateObjectsByProjection(ORB_SLAM2::KeyFrame *pKF)
                     else
                     {
                         // if pMP is already associate to a different object, set bad flag
-                        if (pMP->object_id != object_id_max_matches)
-                            pMP->SetBadFlag();
+                        // if (pMP->object_id != object_id_max_matches)
+                        //     pMP->SetBadFlag();
                     }
                 }
             }

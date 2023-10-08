@@ -43,8 +43,11 @@ class Frame:
             self.object_class = "cars"
         self.frame_id = frame_id
         rgb_file = os.path.join(self.rgb_dir, "{:06d}".format(frame_id) + ".png")
+        # print("{:06d}".format(frame_id) + ".png")
         self.img_bgr = cv2.imread(rgb_file)
-        self.img_rgb = cv2.cvtColor(self.img_bgr, cv2.COLOR_BGR2RGB)
+        if self.img_bgr is None:
+            self.img_bgr = np.zeros((480, 640, 3), dtype=np.uint8)
+        self.img_rgb = cv2.cvtColor(self.img_bgr, cv2.COLOR_BGR2RGB)        
         self.img_h, self.img_w, _ = self.img_rgb.shape
         self.instances = []
 
@@ -92,26 +95,45 @@ class Frame:
             return
 
         # For redwood and freiburg cars, we only focus on the object in the middle
-        max_id = np.argmax(masks_2d.sum(axis=-1).sum(axis=-1))
-        mask_max = masks_2d[max_id, ...].astype(np.float32) * 255.
-        bbox_max = bboxes_2d[max_id, ...]
+        # max_id = np.argmax(masks_2d.sum(axis=-1).sum(axis=-1))
+        # mask_max = masks_2d[max_id, ...].astype(np.float32) * 255.
+        # bbox_max = bboxes_2d[max_id, ...]
 
-        non_surface_pixels = self.pixels_sampler(bbox_max, mask_max.astype(np.bool8))
+        # non_surface_pixels = self.pixels_sampler(bbox_max, mask_max.astype(np.bool8))
 
-        if non_surface_pixels.shape[0] > 200:
-            sample_ind = np.linspace(0, non_surface_pixels.shape[0]-1, 200).astype(np.int32)
-            non_surface_pixels = non_surface_pixels[sample_ind, :]
+        # if non_surface_pixels.shape[0] > 200:
+        #     sample_ind = np.linspace(0, non_surface_pixels.shape[0]-1, 200).astype(np.int32)
+        #     non_surface_pixels = non_surface_pixels[sample_ind, :]
 
-        distortion_coef = np.array([self.k1, self.k2, 0.0, 0.0, 0.0])
-        non_surface_pixels_undistort = cv2.undistortPoints(non_surface_pixels.reshape(1, -1, 2).astype(np.float32), self.K, distortion_coef, P=self.K).squeeze()
-        background_rays_undist = get_rays(non_surface_pixels_undistort, self.invK).astype(np.float32)
+        # distortion_coef = np.array([self.k1, self.k2, 0.0, 0.0, 0.0])
+        # non_surface_pixels_undistort = cv2.undistortPoints(non_surface_pixels.reshape(1, -1, 2).astype(np.float32), self.K, distortion_coef, P=self.K).squeeze()
+        # background_rays_undist = get_rays(non_surface_pixels_undistort, self.invK).astype(np.float32)
 
-        instance = ForceKeyErrorDict()
-        instance.bbox = bbox_max
-        instance.mask = mask_max
-        instance.background_rays = background_rays_undist
+        # instance = ForceKeyErrorDict()
+        # instance.bbox = bbox_max
+        # instance.mask = mask_max
+        # instance.background_rays = background_rays_undist
 
-        self.instances = [instance]
+        # self.instances = [instance]
+        for idx in range(masks_2d.shape[0]):
+            mask = masks_2d[idx, ...].astype(np.float32) * 255.
+            bbox = bboxes_2d[idx, ...]
+
+            non_surface_pixels = self.pixels_sampler(bbox, mask.astype(np.bool8))
+            if non_surface_pixels.shape[0] > 200:
+                sample_ind = np.linspace(0, non_surface_pixels.shape[0]-1, 200).astype(np.int32)
+                non_surface_pixels = non_surface_pixels[sample_ind, :]
+
+            distortion_coef = np.array([self.k1, self.k2, 0.0, 0.0, 0.0])
+            non_surface_pixels_undistort = cv2.undistortPoints(non_surface_pixels.reshape(1, -1, 2).astype(np.float32), self.K, distortion_coef, P=self.K).squeeze()
+            background_rays_undist = get_rays(non_surface_pixels_undistort, self.invK).astype(np.float32)
+
+            instance = ForceKeyErrorDict()
+            instance.bbox = bbox
+            instance.mask = mask
+            instance.background_rays = background_rays_undist
+
+            self.instances.append(instance)
 
 
 class MonoSequence:

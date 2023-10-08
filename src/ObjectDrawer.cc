@@ -107,9 +107,9 @@ void ObjectDrawer::DrawObjects(bool bFollow, const Eigen::Matrix4f &Tec)
                 distance += (Sim3Two(2, 3) - iter[2*4+3])*(Sim3Two(2, 3) - iter[2*4+3]);
             
             distance = sqrt(distance);
-            if (distance<7){
+            if (distance<5){
                 pMO->checkArea = 1;
-                cout<<"id: " << pMO->mnId << " " << "True" << endl;
+                // cout<<"id: " << pMO->mnId << " " << "True" << endl;
                 break;
             }
             else

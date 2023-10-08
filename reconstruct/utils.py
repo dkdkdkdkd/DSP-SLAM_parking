@@ -58,7 +58,7 @@ def set_view(vis, dist=100., theta=np.pi/6.):
 def read_calib_file(filepath):
     """Read in a KITTI calibration file and parse into a dictionary."""
     data = {}
-
+    print(filepath)
     with open(filepath, 'r') as f:
         for line in f.readlines():
             if line == "\n":

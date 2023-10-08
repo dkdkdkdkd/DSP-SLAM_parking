@@ -301,6 +301,7 @@ void Tracking::Track()
     }
     else
     {
+
         // System is initialized. Track Frame.
         bool bOK;
 
@@ -312,6 +313,7 @@ void Tracking::Track()
 
             if(mState==OK)
             {
+
                 // Local Mapping might have changed some MapPoints tracked in last frame
                 CheckReplacedInLastFrame();
 
@@ -321,6 +323,7 @@ void Tracking::Track()
                 }
                 else
                 {
+
                     bOK = TrackWithMotionModel();
                     if(!bOK)
                         bOK = TrackReferenceKeyFrame();
@@ -328,6 +331,7 @@ void Tracking::Track()
             }
             else
             {
+
                 bOK = Relocalization();
             }
         }
@@ -399,8 +403,9 @@ void Tracking::Track()
                     }
 
                     bOK = bOKReloc || bOKMM;
-                }
+                }   
             }
+
         }
 
         mCurrentFrame.mpReferenceKF = mpReferenceKF;
@@ -431,6 +436,7 @@ void Tracking::Track()
         // If tracking were good, check if we insert a keyframe
         if(bOK)
         {
+            
             // Update motion model
             if(!mLastFrame.mTcw.empty())
             {
@@ -477,9 +483,11 @@ void Tracking::Track()
             // with those points so we discard them in the frame.
             for(int i=0; i<mCurrentFrame.N;i++)
             {
+
                 if(mCurrentFrame.mvpMapPoints[i] && mCurrentFrame.mvbOutlier[i])
                     mCurrentFrame.mvpMapPoints[i]=static_cast<MapPoint*>(NULL);
             }
+
         }
 
         // Reset if the camera get lost soon after initialization
@@ -1085,26 +1093,33 @@ void Tracking::CreateNewKeyFrame()
 
     if (mSensor == System::STEREO)
     {
+
         GetObjectDetectionsLiDAR(pKF);
         if (!mpMap->GetAllMapObjects().empty())
         {
             ObjectDataAssociation(pKF);
         }
+
     }
     else if (mSensor == System::MONOCULAR)
     {
+
         std::chrono::steady_clock::time_point t1 = std::chrono::steady_clock::now();
         GetObjectDetectionsMono(pKF);
+        
         //DetectObjects(pKF);
         if (!mpMap->GetAllMapObjects().empty())
         {
             // AssociateObjects(pKF);
             AssociateObjectsByProjection(pKF);
+
         }
+
         std::chrono::steady_clock::time_point t2 = std::chrono::steady_clock::now();
 
         double ttrack= std::chrono::duration_cast<std::chrono::duration<double> >(t2 - t1).count();
         cout << "Object detection takes " << ttrack << endl;
+
     }
 
     mpReferenceKF = pKF;

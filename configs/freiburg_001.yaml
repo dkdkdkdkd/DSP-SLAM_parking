@@ -58,3 +58,6 @@ Viewer.ViewpointX: 0
 Viewer.ViewpointY: -10   # originally -10
 Viewer.ViewpointZ: -0.1
 Viewer.ViewpointF: 2000
+
+
+Map.mapfile: map_mono.bin

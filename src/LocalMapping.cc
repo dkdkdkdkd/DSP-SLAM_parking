@@ -99,11 +99,11 @@ void LocalMapping::Run()
             {
                 if (mpTracker->mState != Tracking::NOT_INITIALIZED)
                 {
-                    if (mpMap->GetAllMapObjects().empty())
-                        CreateNewObjectsFromDetections();
-                    // reconstruction
-                    ProcessDetectedObjects();
+                    // if (mpMap->GetAllMapObjects().empty())
                 }
+                    ProcessDetectedObjects();
+                    CreateNewObjectsFromDetections();
+                    // reconstruction
             }
             if (!stopRequested())
                 mbAbortBA = false;
