@@ -174,7 +174,7 @@ void Tracking::SetViewer(Viewer *pViewer)
 }
 
 
-cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRectRight, const double &timestamp)
+cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRectRight, const double &timestamp, string png_id)
 {
     mImGray = imRectLeft;
     cv::Mat imGrayRight = imRectRight;
@@ -209,7 +209,7 @@ cv::Mat Tracking::GrabImageStereo(const cv::Mat &imRectLeft, const cv::Mat &imRe
     mCurrentFrame = Frame(mImGray, imGrayRight, timestamp, mpORBextractorLeft,
             mpORBextractorRight, mpORBVocabulary,mK,mDistCoef, mbf, mThDepth);
 
-    Track();
+    Track(png_id);
 
     return mCurrentFrame.mTcw.clone();
 }
@@ -240,7 +240,7 @@ cv::Mat Tracking::GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const d
 
     mCurrentFrame = Frame(mImGray,imDepth,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 
-    Track();
+    Track("");
 
     return mCurrentFrame.mTcw.clone();
 }
@@ -270,12 +270,12 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp)
     else
         mCurrentFrame = Frame(mImGray,timestamp,mpORBextractorLeft,mpORBVocabulary,mK,mDistCoef,mbf,mThDepth);
 
-    Track();
+    Track("");
 
     return mCurrentFrame.mTcw.clone();
 }
 
-void Tracking::Track()
+void Tracking::Track(string png_id)
 {
     if(mState==NO_IMAGES_YET)
     {
@@ -290,7 +290,7 @@ void Tracking::Track()
     if(mState==NOT_INITIALIZED)
     {
         if(mSensor==System::STEREO || mSensor==System::RGBD)
-            StereoInitialization();
+            StereoInitialization(png_id);
         else
             MonocularInitialization();
 
@@ -474,7 +474,7 @@ void Tracking::Track()
             if(NeedNewKeyFrame())
             {
                 cout << "New Keyframe" << endl;
-                CreateNewKeyFrame();
+                CreateNewKeyFrame(png_id);
             }
 
             // We allow points with high innovation (considererd outliers by the Huber Function)
@@ -529,7 +529,7 @@ void Tracking::Track()
 
 }
 
-void Tracking::StereoInitialization()
+void Tracking::StereoInitialization(string png_id)
 {  
     if(mCurrentFrame.N>500)
     {
@@ -538,7 +538,7 @@ void Tracking::StereoInitialization()
 
         // Create KeyFrame
         KeyFrame* pKFini = new KeyFrame(mCurrentFrame, mpMap, mpKeyFrameDB);
-        GetObjectDetectionsLiDAR(pKFini);
+        GetObjectDetectionsLiDAR(pKFini, png_id);
         // PyEval_ReleaseThread(PyThreadState_Get());
         // Insert KeyFrame in the map
         mpMap->AddKeyFrame(pKFini);
@@ -1083,7 +1083,7 @@ bool Tracking::NeedNewKeyFrame()
         return false;
 }
 
-void Tracking::CreateNewKeyFrame()
+void Tracking::CreateNewKeyFrame(string png_id)
 {   
     
     if(!mpLocalMapper->SetNotStop(true))
@@ -1094,7 +1094,7 @@ void Tracking::CreateNewKeyFrame()
     if (mSensor == System::STEREO)
     {
 
-        GetObjectDetectionsLiDAR(pKF);
+        GetObjectDetectionsLiDAR(pKF, png_id);
         if (!mpMap->GetAllMapObjects().empty())
         {
             ObjectDataAssociation(pKF);

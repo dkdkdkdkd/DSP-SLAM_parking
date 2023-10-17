@@ -25,7 +25,7 @@ from reconstruct import get_detectors
 
 
 class FrameWithLiDAR:
-    def __init__(self, sequence, frame_id):
+    def __init__(self, sequence, frame_id, png_id):
         # Load sequence properties
         self.configs = sequence.configs
         self.rgb_dir = sequence.rgb_dir
@@ -44,8 +44,8 @@ class FrameWithLiDAR:
 
         # Load image and LiDAR measurements
         self.frame_id = frame_id
-        rgb_file = os.path.join(self.rgb_dir, "{:06d}".format(frame_id) + ".png")
-        self.velo_file = os.path.join(self.velo_dir, "{:06d}".format(frame_id) + ".bin")
+        rgb_file = os.path.join(self.rgb_dir, png_id+ ".png")
+        self.velo_file = os.path.join(self.velo_dir, png_id + ".bin")
         self.img_bgr = cv2.imread(rgb_file)
         self.img_rgb = cv2.cvtColor(self.img_bgr, cv2.COLOR_BGR2RGB)
 
@@ -254,8 +254,8 @@ class KITIISequence:
         T_cam2_cam0[0, 3] = P_cam2_cam0[0, 3] / P_cam2_cam0[0, 0]
         self.T_cam_velo = T_cam2_cam0.dot(T_cam0_velo).astype(np.float32)
 
-    def get_frame_by_id(self, frame_id):
-        self.current_frame = FrameWithLiDAR(self, frame_id)
+    def get_frame_by_id(self, frame_id, png_id):
+        self.current_frame = FrameWithLiDAR(self, frame_id, png_id)
         self.current_frame.get_detections()
         self.detections_in_current_frame = self.current_frame.instances
         return self.detections_in_current_frame

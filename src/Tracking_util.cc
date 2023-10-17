@@ -28,11 +28,11 @@ namespace ORB_SLAM2 {
 /*
  * Tracking utils for stereo+lidar on KITTI
  */
-void Tracking::GetObjectDetectionsLiDAR(KeyFrame *pKF) {
+void Tracking::GetObjectDetectionsLiDAR(KeyFrame *pKF, string png_id) {
 
     PyThreadStateLock PyThreadLock;
     
-    py::list detections = mpSystem->pySequence.attr("get_frame_by_id")(pKF->mnFrameId);
+    py::list detections = mpSystem->pySequence.attr("get_frame_by_id")(pKF->mnFrameId, png_id);
 
     for (auto det : detections) {
         auto pts = det.attr("surface_points").cast<Eigen::MatrixXf>();

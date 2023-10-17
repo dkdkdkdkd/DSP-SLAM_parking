@@ -60,7 +60,7 @@ public:
              KeyFrameDatabase* pKFDB, const string &strSettingPath, const int sensor, bool bReuseMap=false);
 
     // Preprocess the input and call Track(). Extract features and performs stereo matching.
-    cv::Mat GrabImageStereo(const cv::Mat &imRectLeft,const cv::Mat &imRectRight, const double &timestamp);
+    cv::Mat GrabImageStereo(const cv::Mat &imRectLeft,const cv::Mat &imRectRight, const double &timestamp, string png_id);
     cv::Mat GrabImageRGBD(const cv::Mat &imRGB,const cv::Mat &imD, const double &timestamp);
     cv::Mat GrabImageMonocular(const cv::Mat &im, const double &timestamp);
 
@@ -78,7 +78,7 @@ public:
 
     // Object SLAM by Jingwen
     // KITTI (stereo+LiDAR)
-    void GetObjectDetectionsLiDAR(KeyFrame *pKF);
+    void GetObjectDetectionsLiDAR(KeyFrame *pKF, string png_id);
     void ObjectDataAssociation(KeyFrame *pKF);
     // Freiburg Cars and Redwood (Mono)
     int maskErrosion;
@@ -131,10 +131,10 @@ public:
 protected:
 
     // Main tracking function. It is independent of the input sensor.
-    void Track();
+    void Track(string png_id);
 
     // Map initialization for stereo and RGB-D
-    void StereoInitialization();
+    void StereoInitialization(string png_id);
 
     // Map initialization for monocular
     void MonocularInitialization();
@@ -155,7 +155,7 @@ protected:
     void SearchLocalPoints();
 
     bool NeedNewKeyFrame();
-    void CreateNewKeyFrame();
+    void CreateNewKeyFrame(string png_id);
 
     // In case of performing only localization, this flag is true when there are no matches to
     // points in the map. Still tracking will continue if there are enough matches with temporal points.
