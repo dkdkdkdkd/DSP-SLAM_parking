@@ -24,8 +24,8 @@
 
 using namespace std;
 
-void LoadImages(const string &strPathToSequence, const float &fps, vector<string> &vstrImageLeft,
-                vector<string> &vstrImageRight, vector<double> &vTimestamps);
+void LoadImages(const string &strPathToSequence, const float &fps, string &strPrefixLeft,string &strPrefixRight,
+                vector<string> &vstrImagenum, vector<double> &vTimestamps);
 
 int main(int argc, char **argv)
 {
@@ -39,12 +39,13 @@ int main(int argc, char **argv)
     float fps = fSettings["Camera.fps"];
 
     // Retrieve paths to images
-    vector<string> vstrImageLeft;
-    vector<string> vstrImageRight;
+    string strPrefixLeft;
+    string strPrefixRight;
+    vector<string> vstrImagenum;
     vector<double> vTimestamps;
-    LoadImages(string(argv[3]), fps, vstrImageLeft, vstrImageRight, vTimestamps);
+    LoadImages(string(argv[3]), fps, strPrefixLeft, strPrefixRight, vstrImagenum, vTimestamps);
 
-    const int nImages = vstrImageLeft.size();
+    const int nImages = vstrImagenum.size();
     // Create SLAM system. It initializes all system threads and gets ready to process frames.
     ORB_SLAM2::System SLAM(argv[1],argv[2], argv[3], ORB_SLAM2::System::STEREO, (bool)atoi(argv[5]));
 
@@ -61,14 +62,14 @@ int main(int argc, char **argv)
     for(int ni=0; ni<nImages; ni++)
     {
         // Read left and right images from file
-        imLeft = cv::imread(vstrImageLeft[ni],CV_LOAD_IMAGE_UNCHANGED);
-        imRight = cv::imread(vstrImageRight[ni],CV_LOAD_IMAGE_UNCHANGED);
+        imLeft = cv::imread(strPrefixLeft+vstrImagenum[ni]+".png",CV_LOAD_IMAGE_UNCHANGED);
+        imRight = cv::imread(strPrefixRight+vstrImagenum[ni]+".png",CV_LOAD_IMAGE_UNCHANGED);
         double tframe = vTimestamps[ni];
 
         if(imLeft.empty())
         {
             cerr << endl << "Failed to load image at: "
-                 << string(vstrImageLeft[ni]) << endl;
+                 << vstrImagenum[ni] << endl;
             return 1;
         }
 
@@ -116,8 +117,8 @@ int main(int argc, char **argv)
     return 0;
 }
 
-void LoadImages(const string &strPathToSequence, const float &fps, vector<string> &vstrImageLeft,
-                vector<string> &vstrImageRight, vector<double> &vTimestamps)
+void LoadImages(const string &strPathToSequence, const float &fps, string &strPrefixLeft,string &strPrefixRight,
+                vector<string> &vstrImagenum, vector<double> &vTimestamps)
 {
     ifstream fTimes;
     string strPathTimeFile = strPathToSequence + "/times.txt";
@@ -135,18 +136,16 @@ void LoadImages(const string &strPathToSequence, const float &fps, vector<string
         }
     }
 
-    string strPrefixLeft = strPathToSequence + "/image_0/";
-    string strPrefixRight = strPathToSequence + "/image_1/";
+    strPrefixLeft = strPathToSequence + "/image_0/";
+    strPrefixRight = strPathToSequence + "/image_1/";
     const int nTimes = vTimestamps.size();
-    vstrImageLeft.resize(nTimes);
-    vstrImageRight.resize(nTimes);
+    vstrImagenum.resize(nTimes);
 
 
     for(int i=0; i<nTimes; i++)
     {
         stringstream ss;
         ss << setfill('0') << setw(6) << i;
-        vstrImageLeft[i] = strPrefixLeft + ss.str() + ".png";
-        vstrImageRight[i] = strPrefixRight + ss.str() + ".png";
+        vstrImagenum[i] = ss.str();
     }
 }
