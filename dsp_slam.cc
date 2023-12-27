@@ -31,7 +31,7 @@ int main(int argc, char **argv)
 {
     if(argc != 6)
     {
-        cerr << endl << "Usage: ./dsp_slam path_to_vocabulary path_to_settings path_to_sequence path_to_save_map path_to_parking_areas [1|0](save map?)" << endl;
+        cerr << endl << "Usage: ./dsp_slam path_to_vocabulary path_to_settings path_to_sequence path_to_save_map path_to_parking_areas [0|1](0:mapping, 1:parking detection)" << endl;
         return 1;
     }
 
@@ -61,6 +61,11 @@ int main(int argc, char **argv)
     cv::Mat imLeft, imRight;
     for(int ni=0; ni<nImages; ni++)
     {
+        if (ni==2){
+            char input;
+            std::cin >> input;
+        }
+
         // Read left and right images from file
         imLeft = cv::imread(strPrefixLeft+vstrImagenum[ni]+".png",CV_LOAD_IMAGE_UNCHANGED);
         imRight = cv::imread(strPrefixRight+vstrImagenum[ni]+".png",CV_LOAD_IMAGE_UNCHANGED);
@@ -100,7 +105,8 @@ int main(int argc, char **argv)
     
     SLAM.SaveEntireMap(string(argv[4]));
 
-    
+    cv::waitKey(0);
+
     // Stop all threads
     SLAM.Shutdown();
     // Tracking time statistics

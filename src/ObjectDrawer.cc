@@ -1,19 +1,19 @@
 /**
-* This file is part of https://github.com/JingwenWang95/DSP-SLAM
-*
-* This program is free software: you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation, either version 3 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>
-*/
+ * This file is part of https://github.com/JingwenWang95/DSP-SLAM
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ */
 
 #include "ObjectDrawer.h"
 
@@ -62,49 +62,74 @@ bool isPointInsideRectangle(const Rectangle &rect, const Point &P)
 namespace ORB_SLAM2
 {
 
-ObjectDrawer::ObjectDrawer(Map *pMap, MapDrawer *pMapDrawer, const string &strSettingPath) : mpMap(pMap), mpMapDrawer(pMapDrawer)
-{
-    cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
-    mViewpointF = fSettings["Viewer.ViewpointF"];
-    mvObjectColors.push_back(std::tuple<float, float, float>({230. / 255., 0., 0.}));	 // red  0
-    mvObjectColors.push_back(std::tuple<float, float, float>({0., 0., 255. / 255.}));	 // blue  1
-    mvObjectColors.push_back(std::tuple<float, float, float>({60. / 255., 180. / 255., 75. / 255.}));   // green  2
-    mvObjectColors.push_back(std::tuple<float, float, float>({255. / 255., 0, 255. / 255.}));   // Magenta  3
-    mvObjectColors.push_back(std::tuple<float, float, float>({255. / 255., 165. / 255., 0}));   // orange 4
-    mvObjectColors.push_back(std::tuple<float, float, float>({128. / 255., 0, 128. / 255.}));   //purple 5
-    mvObjectColors.push_back(std::tuple<float, float, float>({0., 255. / 255., 255. / 255.}));   //cyan 6
-    mvObjectColors.push_back(std::tuple<float, float, float>({210. / 255., 245. / 255., 60. / 255.}));  //lime  7
-    mvObjectColors.push_back(std::tuple<float, float, float>({250. / 255., 190. / 255., 190. / 255.})); //pink  8
-    mvObjectColors.push_back(std::tuple<float, float, float>({0., 128. / 255., 128. / 255.}));   //Teal  9
-    SE3Tcw = Eigen::Matrix4f::Identity();
-    SE3TcwFollow = Eigen::Matrix4f::Identity();
-}
-
-void ObjectDrawer::SetRenderer(ObjectRenderer *pRenderer)
-{
-    mpRenderer = pRenderer;
-}
-
-void ObjectDrawer::AddObject(MapObject *pMO)
-{
-    unique_lock<mutex> lock(mMutexObjects);
-    mlNewMapObjects.push_back(pMO);
-}
-
-void ObjectDrawer::ProcessNewObjects()
-{
-    unique_lock<mutex> lock(mMutexObjects);
-    auto pMO = mlNewMapObjects.front();
-    if (pMO)
+    ObjectDrawer::ObjectDrawer(Map *pMap, MapDrawer *pMapDrawer, const string &strSettingPath) : mpMap(pMap), mpMapDrawer(pMapDrawer)
     {
-        int renderId = (int) mpRenderer->AddObject(pMO->vertices, pMO->faces);
-        pMO->SetRenderId(renderId);
-        mlNewMapObjects.pop_front();
+        cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
+        mViewpointF = fSettings["Viewer.ViewpointF"];
+        mvObjectColors.push_back(std::tuple<float, float, float>({230. / 255., 0., 0.}));                   // red  0
+        mvObjectColors.push_back(std::tuple<float, float, float>({0., 0., 255. / 255.}));                   // blue  1
+        mvObjectColors.push_back(std::tuple<float, float, float>({60. / 255., 180. / 255., 75. / 255.}));   // green  2
+        mvObjectColors.push_back(std::tuple<float, float, float>({255. / 255., 0, 255. / 255.}));           // Magenta  3
+        mvObjectColors.push_back(std::tuple<float, float, float>({255. / 255., 165. / 255., 0}));           // orange 4
+        mvObjectColors.push_back(std::tuple<float, float, float>({128. / 255., 0, 128. / 255.}));           // purple 5
+        mvObjectColors.push_back(std::tuple<float, float, float>({0., 255. / 255., 255. / 255.}));          // cyan 6
+        mvObjectColors.push_back(std::tuple<float, float, float>({210. / 255., 245. / 255., 60. / 255.}));  // lime  7
+        mvObjectColors.push_back(std::tuple<float, float, float>({250. / 255., 190. / 255., 190. / 255.})); // pink  8
+        mvObjectColors.push_back(std::tuple<float, float, float>({0., 128. / 255., 128. / 255.}));          // Teal  9
+        SE3Tcw = Eigen::Matrix4f::Identity();
+        SE3TcwFollow = Eigen::Matrix4f::Identity();
     }
-}
 
-void ObjectDrawer::DrawObjects(bool bFollow, const Eigen::Matrix4f &Tec)
-{
+    void ObjectDrawer::SetRenderer(ObjectRenderer *pRenderer)
+    {
+        mpRenderer = pRenderer;
+    }
+
+    void ObjectDrawer::AddObject(MapObject *pMO)
+    {
+        unique_lock<mutex> lock(mMutexObjects);
+        mlNewMapObjects.push_back(pMO);
+    }
+
+    void ObjectDrawer::ProcessNewObjects()
+    {
+        unique_lock<mutex> lock(mMutexObjects);
+        auto pMO = mlNewMapObjects.front();
+        if (pMO)
+        {
+            int renderId = (int)mpRenderer->AddObject(pMO->vertices, pMO->faces);
+            pMO->SetRenderId(renderId);
+            mlNewMapObjects.pop_front();
+        }
+    }
+
+    void ObjectDrawer::DrawObjects(bool bFollow, const Eigen::Matrix4f &Tec)
+    {
+        glLineWidth(3.0);
+
+        std::ifstream file("/home/jiho/slam/DSP-SLAM_parking/data/legal_parking_zone_coordinates.txt");
+        std::string line;
+        while (std::getline(file, line))
+        {
+            std::istringstream iss(line);
+            double x1, y1, x2, y2, x3, y3, x4, y4;
+            if (iss >> x1 >> y1 >> x2 >> y2 >> x3 >> y3 >> x4 >> y4)
+            {
+                glBegin(GL_LINE_LOOP);
+                glColor3f(0.0, 1.0, 0.0);
+
+                glVertex3f(x1, 6.0, y1);
+                glVertex3f(x2, 6.0, y2);
+                glVertex3f(x3, 6.0, y3);
+                glVertex3f(x4, 6.0, y4);
+                glEnd();
+            }
+            else
+            {
+                std::cerr << "잘못된 입력 형식입니다: " << line << std::endl;
+            }
+        }
+        file.close();
         unique_lock<mutex> lock(mMutexObjects);
 
         auto mvpMapObjects = mpMap->GetAllMapObjects();
@@ -174,72 +199,71 @@ void ObjectDrawer::DrawObjects(bool bFollow, const Eigen::Matrix4f &Tec)
         }
     }
 
-void ObjectDrawer::DrawCuboid(MapObject *pMO)
-{
-    const float w = pMO->w / 2;
-    const float h = pMO->h / 2;
-    const float l = pMO->l / 2;
+    void ObjectDrawer::DrawCuboid(MapObject *pMO)
+    {
+        const float w = pMO->w / 2;
+        const float h = pMO->h / 2;
+        const float l = pMO->l / 2;
 
-    glPushMatrix();
+        glPushMatrix();
 
-    pangolin::OpenGlMatrix Two = Converter::toMatrixPango(pMO->SE3Two);
+        pangolin::OpenGlMatrix Two = Converter::toMatrixPango(pMO->SE3Two);
 #ifdef HAVE_GLES
-    glMultMatrixf(Two.m);
+        glMultMatrixf(Two.m);
 #else
-    glMultMatrixd(Two.m);
+        glMultMatrixd(Two.m);
 #endif
 
-    const float mCuboidLineWidth = 3.0;
-    glLineWidth(mCuboidLineWidth);
-    glColor3f(0.0f,1.0f,0.0f);
-    glBegin(GL_LINES);
+        const float mCuboidLineWidth = 3.0;
+        glLineWidth(mCuboidLineWidth);
+        glColor3f(0.0f, 1.0f, 0.0f);
+        glBegin(GL_LINES);
 
-    glVertex3f(w,h,l);
-    glVertex3f(w,-h,l);
+        glVertex3f(w, h, l);
+        glVertex3f(w, -h, l);
 
-    glVertex3f(-w,h,l);
-    glVertex3f(-w,-h,l);
+        glVertex3f(-w, h, l);
+        glVertex3f(-w, -h, l);
 
-    glVertex3f(-w,h,l);
-    glVertex3f(w,h,l);
+        glVertex3f(-w, h, l);
+        glVertex3f(w, h, l);
 
-    glVertex3f(-w,-h,l);
-    glVertex3f(w,-h,l);
+        glVertex3f(-w, -h, l);
+        glVertex3f(w, -h, l);
 
-    glVertex3f(w,h,-l);
-    glVertex3f(w,-h,-l);
+        glVertex3f(w, h, -l);
+        glVertex3f(w, -h, -l);
 
-    glVertex3f(-w,h,-l);
-    glVertex3f(-w,-h,-l);
+        glVertex3f(-w, h, -l);
+        glVertex3f(-w, -h, -l);
 
-    glVertex3f(-w,h,-l);
-    glVertex3f(w,h,-l);
+        glVertex3f(-w, h, -l);
+        glVertex3f(w, h, -l);
 
-    glVertex3f(-w,-h,-l);
-    glVertex3f(w,-h,-l);
+        glVertex3f(-w, -h, -l);
+        glVertex3f(w, -h, -l);
 
-    glVertex3f(w,h,-l);
-    glVertex3f(w,h,l);
+        glVertex3f(w, h, -l);
+        glVertex3f(w, h, l);
 
-    glVertex3f(-w,h,-l);
-    glVertex3f(-w,h,l);
+        glVertex3f(-w, h, -l);
+        glVertex3f(-w, h, l);
 
-    glVertex3f(-w,-h,-l);
-    glVertex3f(-w,-h,l);
+        glVertex3f(-w, -h, -l);
+        glVertex3f(-w, -h, l);
 
-    glVertex3f(w,-h,-l);
-    glVertex3f(w,-h,l);
+        glVertex3f(w, -h, -l);
+        glVertex3f(w, -h, l);
 
-    glEnd();
+        glEnd();
 
-    glPopMatrix();
+        glPopMatrix();
+    }
+
+    void ObjectDrawer::SetCurrentCameraPose(const Eigen::Matrix4f &Tcw)
+    {
+        unique_lock<mutex> lock(mMutexObjects);
+        SE3Tcw = Tcw;
+    }
+
 }
-
-void ObjectDrawer::SetCurrentCameraPose(const Eigen::Matrix4f &Tcw)
-{
-    unique_lock<mutex> lock(mMutexObjects);
-    SE3Tcw = Tcw;
-}
-
-}
-

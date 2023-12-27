@@ -51,6 +51,7 @@ namespace ORB_SLAM2
 
     void MapDrawer::DrawMapPoints()
     {
+        
         const vector<MapPoint *> &vpMPs = mpMap->GetAllMapPoints();
         const vector<MapPoint *> &vpRefMPs = mpMap->GetReferenceMapPoints();
 
@@ -107,36 +108,7 @@ namespace ORB_SLAM2
             }
             glEnd();
         }
-        glLineWidth(3.0);
         
-
-        std::ifstream file("/home/jiho/slam/DSP-SLAM_parking/data/legal_parking_zone_coordinates.txt");
-        std::string line;
-        while (std::getline(file, line))
-        {
-            std::istringstream iss(line);
-            double x1, y1, x2, y2, x3, y3, x4, y4;
-            if (iss >> x1 >> y1 >> x2 >> y2 >> x3 >> y3 >> x4 >> y4)
-            {
-                glBegin(GL_LINE_LOOP);
-                glColor3f(0.0, 1.0, 0.0);
-
-                glVertex3f(x1, 0.0, y1);
-                glVertex3f(x2, 0.0, y2);
-                glVertex3f(x3, 0.0, y3);
-                glVertex3f(x4, 0.0, y4);
-                glEnd();    
-
-            }
-            else
-            {
-                std::cerr << "잘못된 입력 형식입니다: " << line << std::endl;
-            }
-        }
-
-
-
-        file.close();
     }
 
     void MapDrawer::DrawKeyFrames(const bool bDrawKF, const bool bDrawGraph)

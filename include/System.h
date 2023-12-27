@@ -83,7 +83,7 @@ public:
 public:
 
     // Initialize the SLAM system. It launches the Local Mapping, Loop Closing and Viewer threads.
-    System(const string &strVocFile, const string &strSettingsFile, const string &strSequencePath, const eSensor sensor = System::STEREO, bool is_save_map_=false);
+    System(const string &strVocFile, const string &strSettingsFile, const string &strSequencePath, const eSensor sensor = System::STEREO, bool is_mode_=false);
 
     //void CheckWellParked(const &pathParkingAreas, )
 
@@ -179,7 +179,7 @@ private:
     Map* mpMap;
 
     string mapfile;
-    bool is_save_map;
+    bool is_mode;
 
     // Tracker. It receives a frame and computes the associated camera pose.
     // It also decides when to insert a new keyframe, create some new MapPoints and

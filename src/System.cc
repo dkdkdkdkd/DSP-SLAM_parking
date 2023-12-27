@@ -38,8 +38,8 @@ namespace ORB_SLAM2
 {
 
 System::System(const string &strVocFile, const string &strSettingsFile, const string &strSequencePath, 
-               const eSensor sensor, bool is_save_map_) :
-               mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), is_save_map(is_save_map_),
+               const eSensor sensor, bool is_mode_) :
+               mSensor(sensor), mpViewer(static_cast<Viewer*>(NULL)), is_mode(is_mode_),
                mbReset(false),mbActivateLocalizationMode(false), mbDeactivateLocalizationMode(false)
 {
     // Output welcome message
@@ -94,37 +94,45 @@ System::System(const string &strVocFile, const string &strSettingsFile, const st
 
     // Set Object-related variables
     py::initialize_interpreter();
-    cv::FileStorage fSettings(strSettingsFile, cv::FileStorage::READ);
-    py::module sys = py::module::import("sys");
-    sys.attr("path").attr("append")("./");
-    py::module io_utils = py::module::import("reconstruct.utils");
     
+    cv::FileStorage fSettings(strSettingsFile, cv::FileStorage::READ);
+
+    py::module sys = py::module::import("sys");
+    
+    sys.attr("path").attr("append")("./");
+    py::module os = py::module::import("os");
+    std::string current_directory = os.attr("getcwd")().cast<std::string>();
+    std::cout << "Current directory: " << current_directory << std::endl;
+
+    py::module io_utils = py::module::import("reconstruct.utils");
+    cout << "Vocabulary loaded!" << endl << endl;
+
     string pyCfgPath = fSettings["DetectorConfigPath"].string();
     pyCfg = io_utils.attr("get_configs")(pyCfgPath);
     pyDecoder = io_utils.attr("get_decoder")(pyCfg);
     pySequence = py::module::import("reconstruct").attr("get_sequence")(strSequencePath, pyCfg);
     cout << endl << "-------" << endl;
     InitThread();
-
     //Create KeyFrame Database
     //Create the Map
-    if (!mapfile.empty() && LoadMap(mapfile))
-    {
-        bReuseMap = false;
-
-    }
-    else 
-    {
+    if(is_mode==false){
         mpKeyFrameDatabase = new KeyFrameDatabase(mpVocabulary);
         mpMap = new Map();
     }
+    else {
+        if (!mapfile.empty() && LoadMap(mapfile))
+        {
+            bReuseMap = false;
+        }
+    }
    
-
+    
     //Create Drawers. These are used by the Viewer
     mpFrameDrawer = new FrameDrawer(mpMap, bReuseMap);
     mpMapDrawer = new MapDrawer(mpMap, strSettingsFile);
     mpObjectDrawer = new ObjectDrawer(mpMap, mpMapDrawer, strSettingsFile);
     mpMapDrawer->SetObjectDrawer(mpObjectDrawer);
+    
 
     //Initialize the Tracking thread
     //(it will live in the main thread of execution, the one that called this constructor)
@@ -149,7 +157,7 @@ System::System(const string &strVocFile, const string &strSettingsFile, const st
     }
 
     //Initialize the Viewer thread and launch
-    mpViewer = new Viewer(this, mpFrameDrawer, mpMapDrawer, mpObjectDrawer, mpTracker,strSettingsFile, bReuseMap);
+    mpViewer = new Viewer(this, mpFrameDrawer, mpMapDrawer, mpObjectDrawer, mpTracker,strSettingsFile, bReuseMap, is_mode);
     mptViewer = new thread(&Viewer::Run, mpViewer);
     mpTracker->SetViewer(mpViewer);
 
@@ -384,7 +392,7 @@ void System::Shutdown()
 
     if(mpViewer)
         pangolin::BindToContext("ORB-SLAM2: Map Viewer");
-    if (is_save_map)
+    if (!is_mode)
         SaveMap(mapfile);
     PyGILState_Ensure();
 }

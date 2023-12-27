@@ -220,7 +220,7 @@ class FrameWithLiDAR:
 class KITIISequence:
     def __init__(self, data_dir, configs):
         self.root_dir = data_dir
-        self.rgb_dir = os.path.join(data_dir, "image_2")
+        self.rgb_dir = os.path.join(data_dir, "image_0")
         self.velo_dir = os.path.join(data_dir, "velodyne")
         self.calib_file = os.path.join(data_dir, "calib.txt")
         self.load_calib()

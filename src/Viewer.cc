@@ -26,9 +26,9 @@
 namespace ORB_SLAM2
 {
 
-Viewer::Viewer(System* pSystem, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, ObjectDrawer *pObjectDrawer, Tracking *pTracking, const string &strSettingPath, bool mbReuseMap_):
+Viewer::Viewer(System* pSystem, FrameDrawer *pFrameDrawer, MapDrawer *pMapDrawer, ObjectDrawer *pObjectDrawer, Tracking *pTracking, const string &strSettingPath, bool mbReuseMap_, int is_mode_):
     mpSystem(pSystem), mpFrameDrawer(pFrameDrawer), mpMapDrawer(pMapDrawer), mpObjectDrawer(pObjectDrawer), mpTracker(pTracking),
-    mbFinishRequested(false), mbFinished(true), mbStopped(true), mbStopRequested(false), mbReuseMap(mbReuseMap_)
+    mbFinishRequested(false), mbFinished(true), mbStopped(true), mbStopRequested(false), mbReuseMap(mbReuseMap_), is_mode(is_mode_)
 {
     cv::FileStorage fSettings(strSettingPath, cv::FileStorage::READ);
 
@@ -148,7 +148,8 @@ void Viewer::Run()
             mpMapDrawer->DrawMapPoints();
 
         mpObjectDrawer->ProcessNewObjects();
-        mpObjectDrawer->DrawObjects(bFollow, Tec);
+        if(is_mode)
+            mpObjectDrawer->DrawObjects(bFollow, Tec);
 
         pangolin::FinishFrame();
 
